@@ -60,7 +60,7 @@ contract AlgoBull is ERC721Royalty, Ownable {
     }
 
     /**
-     * @dev Mints a token in exchange for the mintFee amount and sends fee amount to owner.
+     * @dev Mints a token.
      * This function is designed to only be used by contract level functions.
      * @param _recipient The address of the account that will receives the minted NFT and pay the fee.
      */
@@ -72,7 +72,7 @@ contract AlgoBull is ERC721Royalty, Ownable {
     }
 
     /**
-     * @dev Mints multiple tokens.
+     * @dev Mints multiple tokens and sends fee amount to owner.
      * The sender must have an adequate balance of stablecoin to pay the fee. minting
      * should not push the total tokens minted above the max token supply.
      * @param _recipient The address of the account that will receive the minted NFT.
