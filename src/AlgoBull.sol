@@ -73,7 +73,7 @@ contract AlgoBull is ERC721Royalty, Ownable {
 
     /**
      * @dev Mints multiple tokens.
-     * The sender must have an adequate balance of stablecoin to pay the free. minting
+     * The sender must have an adequate balance of stablecoin to pay the fee. minting
      * should not push the total tokens minted above the max token supply.
      * @param _recipient The address of the account that will receive the minted NFT.
      */
