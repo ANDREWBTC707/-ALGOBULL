@@ -23,7 +23,8 @@ forge test
 - [x] Limit maximum mint of NFTs to 1000.
 - [x] Expose function to give users number of NFTs left to mint (`unclaimed()`).
 - [x] NFT minting sets a 10% (1000 bip) royalty for all minted NFTs (Set `_setDefaultRoyalty(_receiver, feeNumerator)` in `ERC721Royalty` constructor).
+- [ ] Write deploy script to bnb testnet and mainnet.
 
 ## Notes
 
-- The `approve` function will need to be called from the front-end before the minting function is called to allow the contract to spend the fee amount of stablecoin to pay for minting. This is because the `msg.sender` when called from the AlgoBull to the ERC20 contract is the AlgoBull address and not the originating sender, the minting user. 
+- The `approve` function will need to be called in a separate transaction before the minting function is called to allow the contract to spend the fee amount of stablecoin to pay for minting. This is because the `msg.sender` when called from the AlgoBull to the ERC20 contract is the AlgoBull address and not the originating sender, the minting user. 
