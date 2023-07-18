@@ -1,0 +1,1 @@
+source .env && forge script script/AlgoBullBNBTestnet.s.sol:DeployAlgoBull --rpc-url $BNB_TESTNET_RPC_URL --broadcast --verify --etherscan-api-key $BNB_SCAN_API_KEY
