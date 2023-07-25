@@ -21,6 +21,7 @@ contract AlgoBull is ERC721Royalty, Ownable {
     uint256 public maxSupply;
     address public devWallet;
     uint256 public devMaxMint;
+    bool public mintActivated;
 
     Counters.Counter private _tokenIds;
 
@@ -49,6 +50,7 @@ contract AlgoBull is ERC721Royalty, Ownable {
         maxSupply = _maxSupply;
         devWallet = _devWallet;
         devMaxMint = _devMaxMint;
+        mintActivated = false;
     }
 
     /**
@@ -57,6 +59,14 @@ contract AlgoBull is ERC721Royalty, Ownable {
      */
     function setDevWallet(address _devWallet) external onlyOwner {
         devWallet = _devWallet;
+    }
+
+    /**
+     * @dev Activates minting.
+     * Sets the minting activated state of the contract to true, allowing minting.
+     */
+    function activateMint() external onlyOwner {
+        mintActivated = true;
     }
 
     /**
@@ -78,6 +88,8 @@ contract AlgoBull is ERC721Royalty, Ownable {
      * @param _recipient The address of the account that will receive the minted NFT.
      */
     function mintMultiple(address _recipient, uint256 quantity) external returns (uint256) {
+        require(mintActivated, "Minting has not yet been activated");
+        require(quantity > 0, "Cannot mint 0 tokens");
         require((_tokenIds.current() + quantity) <= unclaimed(), "Cannot mint beyond remaining supply");
 
         bool isDev = msg.sender == devWallet;
