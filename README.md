@@ -23,7 +23,6 @@ forge test
 - [x] Limit maximum mint of NFTs to 1000.
 - [x] Expose function to give users number of NFTs left to mint (`unclaimed()`).
 - [x] NFT minting sets a 10% (1000 bip) royalty for all minted NFTs (Set `_setDefaultRoyalty(_receiver, feeNumerator)` in `ERC721Royalty` constructor).
-- [ ] Write deploy script to bnb testnet and mainnet.
 
 ## Notes
 
