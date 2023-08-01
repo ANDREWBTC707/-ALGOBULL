@@ -20,7 +20,6 @@ contract DeployAlgoBull is Script {
         address _devWallet = 0x5c57Afeb070B0F089E4DeDE58deF524143D1b54d;
         uint256 _devMaxMint = 3;
 
-
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
 
         vm.startBroadcast(deployerPrivateKey);

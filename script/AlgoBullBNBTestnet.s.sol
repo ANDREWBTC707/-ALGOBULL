@@ -11,15 +11,11 @@ contract DeployAlgoBull is Script {
         address _royaltyReceiver = 0x1A22f8e327adD0320d7ea341dFE892e43bC60322;
         uint96 _royaltyFeeNumerator = 1000;
         // BUSD on BNB testnet
-        // address _stablecoinAddress = 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee;
-
-        // LINK on sepolia, for ease of faucet
         address _stablecoinAddress = 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee;
-        uint256 _mintFee = 1e18;
+        uint256 _mintFee = 500e18;
         uint256 _maxSupply = 1000;
         address _devWallet = 0x5c57Afeb070B0F089E4DeDE58deF524143D1b54d;
-        uint256 _devMaxMint = 3;
-
+        uint256 _devMaxMint = 25;
 
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
 

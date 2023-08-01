@@ -3,7 +3,9 @@ pragma solidity ^0.8.0;
 import "lib/openzeppelin-contracts/contracts/utils/Counters.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Royalty.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 
 /**
  * @dev AlgoBull NFT Minting Contract that implements the following properties:
@@ -13,15 +15,16 @@ import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
  * - Apply royalties via ERC2981.
  * - Support a dev wallet's ability to waive minting fees up to a set amount.
  */
-contract AlgoBull is ERC721Royalty, Ownable {
+contract AlgoBull is ERC721Royalty, ERC721URIStorage, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
+
+    string public tokenIPFSUri = "ipfs://bafkreiau7zsjgl3ieud3rswejmpdga2tido5qyicnvedpgezcq5hmh4zhq";
 
     uint256 public mintFee;
     ERC20 private stablecoin;
     uint256 public maxSupply;
     address public devWallet;
     uint256 public devMaxMint;
-    bool public mintActivated;
 
     Counters.Counter private _tokenIds;
 
@@ -50,7 +53,6 @@ contract AlgoBull is ERC721Royalty, Ownable {
         maxSupply = _maxSupply;
         devWallet = _devWallet;
         devMaxMint = _devMaxMint;
-        mintActivated = false;
     }
 
     /**
@@ -62,22 +64,16 @@ contract AlgoBull is ERC721Royalty, Ownable {
     }
 
     /**
-     * @dev Activates minting.
-     * Sets the minting activated state of the contract to true, allowing minting.
-     */
-    function activateMint() external onlyOwner {
-        mintActivated = true;
-    }
-
-    /**
      * @dev Mints a token.
      * This function is designed to only be used by contract level functions.
      * @param _recipient The address of the account that will receives the minted NFT and pay the fee.
      */
-    function mint(address _recipient) private returns (uint256) {
+    function mint(address _recipient) private nonReentrant returns (uint256) {
         uint256 newID = _tokenIds.current();
         _mint(_recipient, newID);
+        _setTokenURI(newID, tokenIPFSUri);
         _tokenIds.increment();
+
         return newID;
     }
 
@@ -88,7 +84,6 @@ contract AlgoBull is ERC721Royalty, Ownable {
      * @param _recipient The address of the account that will receive the minted NFT.
      */
     function mintMultiple(address _recipient, uint256 quantity) external returns (uint256) {
-        require(mintActivated, "Minting has not yet been activated");
         require(quantity > 0, "Cannot mint 0 tokens");
         require((_tokenIds.current() + quantity) <= unclaimed(), "Cannot mint beyond remaining supply");
 
@@ -123,5 +118,31 @@ contract AlgoBull is ERC721Royalty, Ownable {
      */
     function unclaimed() public view returns (uint256) {
         return maxSupply - _tokenIds.current();
+    }
+
+    /**
+     * @dev See {IERC721Metadata-tokenURI}.
+     */
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    /**
+     * @dev See {ERC721-_burn}.
+     */
+    function _burn(uint256 tokenId) internal override(ERC721Royalty, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721Royalty, ERC721URIStorage)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

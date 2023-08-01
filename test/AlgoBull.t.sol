@@ -37,9 +37,6 @@ contract AlgoBullTest is Test {
     }
 
     function test_RoyaltyFeeAndReceiverAreSet() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         deal(address(_stablecoin), _minter, _mintFee);
 
         vm.prank(_minter);
@@ -58,9 +55,6 @@ contract AlgoBullTest is Test {
     }
 
     function test_SenderCannotMintBeyondRemainingSupply() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         uint256 supplyOverflow = _maxSupply + 1;
         uint256 totalFees = supplyOverflow * _mintFee;
 
@@ -75,18 +69,12 @@ contract AlgoBullTest is Test {
     }
 
     function test_SenderCannotMintWithoutFee() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         vm.prank(_minter);
         vm.expectRevert("Sender needs to approve contract to spend total fee amount");
         algoBull.mintMultiple(_minter, 1);
     }
 
     function test_SenderPaysFeeAmountOnMint() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         deal(address(_stablecoin), _minter, _mintFee);
 
         vm.prank(_minter);
@@ -98,10 +86,19 @@ contract AlgoBullTest is Test {
         assertEq(_stablecoin.balanceOf(_minter), 0);
     }
 
-    function test_FeeAmountIsSentToAdminOnMint() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
+    function test_NFTUriIsSetOnMint() public {
+        deal(address(_stablecoin), _minter, _mintFee);
 
+        vm.prank(_minter);
+        _stablecoin.approve(address(algoBull), _mintFee);
+
+        vm.prank(_minter);
+        algoBull.mintMultiple(_minter, 1);
+
+        assertEq(algoBull.tokenURI(0), "ipfs://bafkreiau7zsjgl3ieud3rswejmpdga2tido5qyicnvedpgezcq5hmh4zhq");
+    }
+
+    function test_FeeAmountIsSentToAdminOnMint() public {
         deal(address(_stablecoin), _minter, _mintFee);
 
         vm.prank(_minter);
@@ -114,9 +111,6 @@ contract AlgoBullTest is Test {
     }
 
     function test_SenderReceivesRequestedQuantityOnMint() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         deal(address(_stablecoin), _minter, _mintFee);
 
         vm.prank(_minter);
@@ -129,9 +123,6 @@ contract AlgoBullTest is Test {
     }
 
     function test_SendersCanMintMaxSupply() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         uint256 totalFees = _maxSupply * _mintFee;
 
         deal(address(_stablecoin), _minter, totalFees);
@@ -159,27 +150,18 @@ contract AlgoBullTest is Test {
     }
 
     function test_DevWalletMustPayFeesPastDevMintMax() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         vm.prank(_devWallet);
         vm.expectRevert("Sender needs to approve contract to spend total fee amount");
         algoBull.mintMultiple(_devWallet, _devMaxMint + 1);
     }
 
     function test_CannotMintZeroToken() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         vm.prank(_devWallet);
         vm.expectRevert("Cannot mint 0 tokens");
         algoBull.mintMultiple(_devWallet, 0);
     }
 
     function test_DevWalletCanMintWithoutFeesUpToLimit() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         vm.prank(_devWallet);
         algoBull.mintMultiple(_devWallet, _devMaxMint);
 
@@ -187,9 +169,6 @@ contract AlgoBullTest is Test {
     }
 
     function test_UnclaimedAmountReflectsRemainingMintable() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
         deal(address(_stablecoin), _minter, _mintFee);
 
         vm.prank(_minter);
@@ -199,25 +178,5 @@ contract AlgoBullTest is Test {
         algoBull.mintMultiple(_minter, 1);
 
         assertEq(algoBull.unclaimed(), _maxSupply - 1);
-    }
-
-    function test_CannotMintWithMintingNotActivated() public {
-        vm.prank(_devWallet);
-        vm.expectRevert("Minting has not yet been activated");
-        algoBull.mintMultiple(_devWallet, 1);
-    }
-
-    function test_MintingMustBeActivatedToMint() public {
-        vm.prank(deployer);
-        algoBull.activateMint();
-
-        vm.prank(_devWallet);
-        _stablecoin.approve(address(algoBull), _mintFee);
-
-        vm.prank(_devWallet);
-        algoBull.mintMultiple(_devWallet, 1);
-
-        assertEq(algoBull.mintActivated(), true);
-        assertEq(algoBull.balanceOf(_devWallet), 1);
     }
 }
